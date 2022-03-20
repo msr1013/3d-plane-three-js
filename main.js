@@ -1,8 +1,11 @@
   // Find the latest version by visiting https://cdn.skypack.dev/three.
 
   import * as THREE from 'https://unpkg.com/three@0.126.1/build/three.module.js';
+  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
+
   import * as dat from 'dat.gui'
-  console.log(dat)
+
+  console.log(OrbitControls)
 
   const gui = new dat.GUI()
   const world = {
@@ -55,6 +58,8 @@
   renderer.setPixelRatio(devicePixelRatio)
   document.body.appendChild(renderer.domElement)
 
+  new OrbitControls(camera,renderer.domElement)
+
   camera.position.z = 5
 
   const planeGeometry = new THREE.PlaneGeometry(10,10,10,10)
@@ -82,6 +87,12 @@
     0xffffff,1)
   light.position.set(0,0,1)
   scene.add(light)
+
+  const backLight = new THREE.DirectionalLight(
+    0xffffff,1)
+  backLight.position.set(0,0,-1)
+  scene.add(backLight)
+
 
   function animate() {
     requestAnimationFrame(animate)
