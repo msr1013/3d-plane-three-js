@@ -28,7 +28,6 @@
   gui.add(world.plane,'heightSegments',1,20).
   onChange(generatePlane)
 
-
   function generatePlane() {
     planeMesh.geometry.dispose()
     planeMesh.geometry = new THREE.PlaneGeometry(
@@ -48,11 +47,11 @@
     }
   }
 
+  const raycaster = new THREE.Raycaster()
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000)
   const renderer = new THREE.WebGLRenderer(
   )
-
 
   renderer.setSize(innerWidth,innerHeight)
   renderer.setPixelRatio(devicePixelRatio)
@@ -64,9 +63,10 @@
 
   const planeGeometry = new THREE.PlaneGeometry(10,10,10,10)
   const planeMaterial = new THREE.MeshPhongMaterial({
-  color:0xff0000,
+
   side:THREE.DoubleSide,
-  flatShading:THREE.FlatShading
+  flatShading:THREE.FlatShading,
+  vertexColors:true
 })
   const planeMesh = new THREE.Mesh(planeGeometry,planeMaterial)
   scene.add(planeMesh)
@@ -83,6 +83,17 @@
 
   }
 
+  const colors = []
+  for (let i = 0; i < planeMesh.geometry.attributes.position.count;i ++) {
+    colors.push(1,0,0)
+  }
+
+  console.log(colors)
+
+  planeMesh.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(colors),3))
+
+  console.log(planeMesh.geometry.attributes)
+
   const light = new THREE.DirectionalLight(
     0xffffff,1)
   light.position.set(0,0,1)
@@ -93,12 +104,46 @@
   backLight.position.set(0,0,-1)
   scene.add(backLight)
 
+  const mouse = {
+    x:undefined,
+    y:undefined
+  }
 
   function animate() {
     requestAnimationFrame(animate)
     renderer.render(scene,camera)
     //planeMesh.rotation.x += 0.01
+    raycaster.setFromCamera(mouse,camera)
+    const intersects = raycaster.intersectObject(planeMesh)
+    if(intersects.length > 0) {
+
+      const {color} = intersects[0].object.geometry.attributes
+
+      // vertice 1
+      color.setX(intersects[0].face.a,0)
+      color.setY(intersects[0].face.a,1)
+      color.setZ(intersects[0].face.a,1)
+
+      //vertice 2
+      color.setX(intersects[0].face.b,0)
+      color.setY(intersects[0].face.b,0)
+      color.setZ(intersects[0].face.b,1)
+
+      //vertice 3
+      color.setX(intersects[0].face.c,0)
+      color.setY(intersects[0].face.c,0)
+      color.setZ(intersects[0].face.c,0)
+
+      intersects[0].object.geometry.attributes.color.needsUpdate = true
+    }
   }
 
-
   animate()
+
+  addEventListener('mousemove',(event) => {
+    mouse.x = (event.clientX / innerWidth)*2 -1
+    mouse.y = -(event.clientY / innerHeight)*2 +1
+
+  })
+
+
