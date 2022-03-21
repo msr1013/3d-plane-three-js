@@ -1,9 +1,12 @@
   // Find the latest version by visiting https://cdn.skypack.dev/three.
 
+  import gsap from 'gsap'
   import * as THREE from 'https://unpkg.com/three@0.126.1/build/three.module.js';
   import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
 
   import * as dat from 'dat.gui'
+
+  console.log(gsap)
 
   console.log(OrbitControls)
 
@@ -85,7 +88,7 @@
 
   const colors = []
   for (let i = 0; i < planeMesh.geometry.attributes.position.count;i ++) {
-    colors.push(1,0,0)
+    colors.push(0,0.19,0.4)
   }
 
   console.log(colors)
@@ -120,21 +123,53 @@
       const {color} = intersects[0].object.geometry.attributes
 
       // vertice 1
-      color.setX(intersects[0].face.a,0)
-      color.setY(intersects[0].face.a,1)
+      color.setX(intersects[0].face.a,0.1)
+      color.setY(intersects[0].face.a,0.5)
       color.setZ(intersects[0].face.a,1)
 
       //vertice 2
-      color.setX(intersects[0].face.b,0)
-      color.setY(intersects[0].face.b,0)
+      color.setX(intersects[0].face.b,0.1)
+      color.setY(intersects[0].face.b,0.5)
       color.setZ(intersects[0].face.b,1)
 
       //vertice 3
-      color.setX(intersects[0].face.c,0)
-      color.setY(intersects[0].face.c,0)
-      color.setZ(intersects[0].face.c,0)
+      color.setX(intersects[0].face.c,0.1)
+      color.setY(intersects[0].face.c,0.5)
+      color.setZ(intersects[0].face.c,1)
 
       intersects[0].object.geometry.attributes.color.needsUpdate = true
+
+      const initialColor = {
+        r:0,
+        g:0.19,
+        b:0.4
+      }
+      const hoverColor = {
+        r:0.1,
+        g:0.5,
+        b:1
+      }
+      gsap.to(hoverColor,{
+        r:initialColor.r,
+        g:initialColor.g,
+        b:initialColor.b,
+        onUpdate: () => {
+          color.setX(intersects[0].face.a,hoverColor.r)
+          color.setY(intersects[0].face.a,hoverColor.g)
+          color.setZ(intersects[0].face.a,hoverColor.b)
+
+          //vertice 2
+          color.setX(intersects[0].face.b,hoverColor.r)
+          color.setY(intersects[0].face.b,hoverColor.g)
+          color.setZ(intersects[0].face.b,hoverColor.b)
+
+          //vertice 3
+          color.setX(intersects[0].face.c,hoverColor.r)
+          color.setY(intersects[0].face.c,hoverColor.g)
+          color.setZ(intersects[0].face.c,hoverColor.b)
+          color.needsUpdate = true
+        }
+      })
     }
   }
 
