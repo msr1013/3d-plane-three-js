@@ -6,9 +6,6 @@
 
   import * as dat from 'dat.gui'
 
-  console.log(gsap)
-
-  console.log(OrbitControls)
 
   const gui = new dat.GUI()
   const world = {
@@ -85,17 +82,29 @@
   const planeMesh = new THREE.Mesh(planeGeometry,planeMaterial)
   scene.add(planeMesh)
 
-  console.log(planeMesh.geometry.attributes.position.array)
+
 
   const {array} = planeMesh.geometry.attributes.position
-  for (let i = 0; i <array.length; i += 3)  {
-    const x = array[i]
-    const y = array[i+1]
-    const z = array[i+2]
+  const randomValues = []
+  for (let i = 0; i <array.length; i++)  {
+    if (i % 3 === 0) {
+      const x = array[i]
+      const y = array[i+1]
+      const z = array[i+2]
 
-    array[i + 2] = z + Math.random()
-
+      array[i] = x + (Math.random() - 0.5)
+      array[i + 1] = y + (Math.random() - 0.5)
+      array[i + 2] = z + Math.random()
+    }
+      randomValues.push(Math.random() - 0.5)
   }
+
+  planeMesh.geometry.attributes.position.
+  randomValues = randomValues
+
+  planeMesh.geometry.attributes.position.originalPosition = planeMesh.geometry.
+  attributes.position.array
+
 
   const colors = []
   for (let i = 0; i < planeMesh.geometry.attributes.position.count;i ++) {
@@ -119,11 +128,23 @@
     y:undefined
   }
 
+  let frame = 0
   function animate() {
     requestAnimationFrame(animate)
     renderer.render(scene,camera)
-    //planeMesh.rotation.x += 0.01
     raycaster.setFromCamera(mouse,camera)
+    frame += 0.01
+
+    const {array,originalPosition,randomValues} = planeMesh.geometry.attributes.position
+    for (let i = 0; i <array.length; i+=3) {
+      array[i] = originalPosition[i] + Math.cos(frame + randomValues[i]) * 0.003
+
+      array[i + 1] = originalPosition[i + 1] +
+      Math.sin(frame + randomValues[i+1]) * 0.01
+    }
+
+    planeMesh.geometry.attributes.position.needsUpdate = true
+
     const intersects = raycaster.intersectObject(planeMesh)
     if(intersects.length > 0) {
 
